@@ -65,8 +65,8 @@ function App() {
     setletters(wordLetters);
     setGamesStage(stages[1].name);
   };
-  const verifyLetter = () => {
-    setGamesStage(stages[2].name);
+  const verifyLetter = (letter) => {
+    console.log(letter);
   };
   const retry = () => {
     setGamesStage(stages[0].name);
