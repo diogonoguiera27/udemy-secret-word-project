@@ -2,7 +2,7 @@
 import "./App.css";
 
 // React
-import { useCallback, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 
 // data
 import { wordsList } from "./data/words";
@@ -17,6 +17,7 @@ const stages = [
   { id: 2, name: "game" },
   { id: 3, name: "end" },
 ];
+ const guessesqty =3
 
 function App() {
   const [gameStage, setGamesStage] = useState(stages[0].name);
@@ -28,7 +29,7 @@ function App() {
 
   const [guessedLetters, setguessedLetters] = useState([]);
   const [wrongLetters, setWrongLetters] = useState([]);
-  const [guesses, setGuesseds] = useState(3);
+  const [guesses, setGuesses] = useState(guessesqty);
   const [score, setScore] = useState(0);
 
   const pickWordAndCategory = () => {
@@ -87,12 +88,27 @@ function App() {
         ...actualWrongLetters,
         normalizedLetter
       ]);
+      setGuesses((actualGuesses) => actualGuesses -1 )
+    }
+  };
+
+   const clearLetterState = () => {
+    setguessedLetters([]);
+    setWrongLetters([])
+   }
+
+  useEffect(() => {
+    if (guesses <=0){
+      // reset all states
+      clearLetterState();
+      setGamesStage(stages[2].name);
     }
 
-    console.log(guessedLetters);
-    console.log(wrongLetters);
-  };
+  },[guesses])
   const retry = () => {
+    setScore(0)
+    setGuesses(guessesqty);
+
     setGamesStage(stages[0].name);
   };
   return (
