@@ -2,7 +2,7 @@
 import "./App.css";
 
 // React
-import {  useEffect, useState } from "react";
+import {  useCallback, useEffect, useState } from "react";
 
 // data
 import { wordsList } from "./data/words";
@@ -32,24 +32,26 @@ function App() {
   const [guesses, setGuesses] = useState(guessesqty);
   const [score, setScore] = useState(0);
 
-  const pickWordAndCategory = () => {
+  const pickWordAndCategory = useCallback (() => {
     // pick random category
     const categories = Object.keys(words);
     const category =
       categories[Math.floor(Math.random() * Object.keys(categories).length)];
 
-    console.log(category);
+    
 
     // pick a random word
     const word =
       words[category][Math.floor(Math.random() * words[category].length)];
-    console.log(word);
+    
 
     return { word, category };
-  };
+  },[words]);
 
   // starts the secret word game
-  const startGame = () => {
+  const startGame = useCallback (() => {
+
+    clearLetterState()
     const { word, category } = pickWordAndCategory();
 
     // create an aray of letters
@@ -57,15 +59,15 @@ function App() {
 
     wordLetters = wordLetters.map((l) => l.toLowerCase());
 
-    console.log(word, category);
-    console.log(wordLetters);
+    
 
     // fill states
     setPickedWord(word);
     setPickedCategory(category);
     setletters(wordLetters);
+
     setGamesStage(stages[1].name);
-  };
+  },[pickWordAndCategory]);
   const verifyLetter = (letter) => {
     const normalizedLetter = letter.toLowerCase()
 
@@ -96,15 +98,25 @@ function App() {
     setguessedLetters([]);
     setWrongLetters([])
    }
-
+ 
   useEffect(() => {
     if (guesses <=0){
       // reset all states
       clearLetterState();
       setGamesStage(stages[2].name);
-    }
+    } 
+  },[guesses]);
 
-  },[guesses])
+ useEffect(() => {
+  const uniqueLetters = [...new Set(letters)];
+
+  if (guessedLetters.length === uniqueLetters.length) {
+    setScore((actualScore) => (actualScore += 100));
+    startGame();
+  }
+}, [guessedLetters, letters, startGame]);
+
+
   const retry = () => {
     setScore(0)
     setGuesses(guessesqty);
